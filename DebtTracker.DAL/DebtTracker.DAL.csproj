@@ -18,6 +18,8 @@
 
   <ItemGroup>
     <Folder Include="Migrations\" />
+    <Folder Include="Mappers\" />
+    <Folder Include="Repositories\" />
     <Folder Include="Seeds\" />
   </ItemGroup>
 

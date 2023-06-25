@@ -10,11 +10,8 @@ public record DebtListModel : ModelBase
     public DateTime? ResolvedDate { get; set; }
 
     public required Guid DebtorId { get; set; }
-    public UserListModel? Debtor { get; set; }
     public required Guid CreditorId { get; set; }
-    public UserListModel? Creditor { get; set; }
     public required Guid GroupId { get; set; }
-    public GroupListModel? Group { get; set; }
 
     public static DebtListModel Empty => new()
     {
@@ -24,10 +21,7 @@ public record DebtListModel : ModelBase
         Date = DateTime.Now,
         ResolvedDate = null,
         DebtorId = Guid.Empty,
-        Debtor = null,
         CreditorId = Guid.Empty,
-        Creditor = null,
         GroupId = Guid.Empty,
-        Group = null
     };
 }

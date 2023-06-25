@@ -16,12 +16,4 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="7.0.7" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Migrations\" />
-    <Folder Include="Mappers\" />
-    <Folder Include="UnitOfWork\" />
-    <Folder Include="Repositories\" />
-    <Folder Include="Seeds\" />
-  </ItemGroup>
-
 </Project>

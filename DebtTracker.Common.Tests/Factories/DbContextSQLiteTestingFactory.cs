@@ -3,12 +3,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DebtTracker.Common.Tests.Factories;
 
-public class DbContextSqLiteTestingFactory : IDbContextFactory<DebtTrackerDbContext>
+public class DbContextSQLiteTestingFactory : IDbContextFactory<DebtTrackerDbContext>
 {
     private readonly string _databaseName;
     private readonly bool _seedTestingData;
 
-    public DbContextSqLiteTestingFactory(string databaseName, bool seedTestingData = false)
+    public DbContextSQLiteTestingFactory(string databaseName, bool seedTestingData = false)
     {
         _databaseName = databaseName;
         _seedTestingData = seedTestingData;

@@ -13,7 +13,7 @@ public class DbContextTestsBase : IAsyncLifetime
         XUnitTestOutputConverter converter = new(output);
         Console.SetOut(converter);
         
-        DbContextFactory = new DbContextSqLiteTestingFactory(GetType().FullName!, seedTestingData: true);
+        DbContextFactory = new DbContextSQLiteTestingFactory(GetType().FullName!, seedTestingData: true);
 
         DebtTrackerDbContextSUT = DbContextFactory.CreateDbContext();
     }

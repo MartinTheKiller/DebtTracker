@@ -14,7 +14,8 @@ public static class DeepAssert
                 IgnoreCollectionOrder = true,
                 IgnoreObjectTypes = true,
                 CompareStaticProperties = false,
-                CompareStaticFields = false
+                CompareStaticFields = false,
+                DateTimeKindToUseWhenUnspecified = DateTimeKind.Local
             }
         };
 

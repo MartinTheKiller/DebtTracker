@@ -13,7 +13,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DebtTracker.DAL.Tests", "De
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DebtTracker.Common.Tests", "DebtTracker.Common.Tests\DebtTracker.Common.Tests.csproj", "{C5D6D149-E47C-438D-967B-267D3AF4BFC0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DebtTracker.BL", "DebtTracker.BL\DebtTracker.BL.csproj", "{D2675359-3A91-4386-8C35-09332266234D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DebtTracker.BL", "DebtTracker.BL\DebtTracker.BL.csproj", "{D2675359-3A91-4386-8C35-09332266234D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DebtTracker.BL.Tests", "DebtTracker.BL.Tests\DebtTracker.BL.Tests.csproj", "{AAF95182-B6E5-4E99-8966-AADC9B535FCF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -37,6 +39,10 @@ Global
 		{D2675359-3A91-4386-8C35-09332266234D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D2675359-3A91-4386-8C35-09332266234D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D2675359-3A91-4386-8C35-09332266234D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AAF95182-B6E5-4E99-8966-AADC9B535FCF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AAF95182-B6E5-4E99-8966-AADC9B535FCF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AAF95182-B6E5-4E99-8966-AADC9B535FCF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AAF95182-B6E5-4E99-8966-AADC9B535FCF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -46,6 +52,7 @@ Global
 		{E75BA7A3-4A28-460B-959E-50AB011819C0} = {F20F0026-8471-4B2E-8971-46B535903F71}
 		{C5D6D149-E47C-438D-967B-267D3AF4BFC0} = {F20F0026-8471-4B2E-8971-46B535903F71}
 		{D2675359-3A91-4386-8C35-09332266234D} = {2C8D1250-F77D-427D-9751-6FADC0A226C4}
+		{AAF95182-B6E5-4E99-8966-AADC9B535FCF} = {F20F0026-8471-4B2E-8971-46B535903F71}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3E1E30BD-F2D9-4643-9083-3C8293443948}

@@ -3,12 +3,17 @@ using DebtTracker.BL.Facades;
 using DebtTracker.BL.Models;
 using Microsoft.AspNetCore.Builder;
 using System.Text.Json.Serialization;
+using DebtTracker.BL;
+using DebtTracker.DAL;
 using Microsoft.AspNetCore.Http.Json;
 using NSwag.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 ConfigureOpenApiDocuments(builder.Services);
+builder.Services.AddBLServices()
+                .AddDALServices("DebtTrackerSqLiteDb", true, true)
+                .AddAutoMapper(typeof(BLInstaller));
 builder.Services.Configure<JsonOptions>(options =>
 {
     options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());

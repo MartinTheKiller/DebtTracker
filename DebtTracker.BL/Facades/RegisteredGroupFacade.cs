@@ -7,7 +7,7 @@ using DebtTracker.DAL.UnitOfWork;
 
 namespace DebtTracker.BL.Facades;
 
-public class RegisteredGroupFacade : FacadeBase<RegisteredGroupEntity, RegisteredGroupModel, RegisteredGroupModel, RegisteredGroupEntityMapper>
+public class RegisteredGroupFacade : FacadeBase<RegisteredGroupEntity, RegisteredGroupModel, RegisteredGroupModel, RegisteredGroupEntityMapper>, IRegisteredGroupFacade
 {
     public RegisteredGroupFacade(IUnitOfWorkFactory unitOfWorkFactory, IMapper modelMapper) : base(unitOfWorkFactory, modelMapper)
     {

@@ -17,6 +17,7 @@
 
   <ItemGroup>
     <Folder Include="Facades\" />
+    <Folder Include="Facades\Interfaces\" />
   </ItemGroup>
 
 </Project>

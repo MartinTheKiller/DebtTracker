@@ -6,7 +6,7 @@ using DebtTracker.DAL.UnitOfWork;
 
 namespace DebtTracker.BL.Facades;
 
-public class UserFacade : FacadeBase<UserEntity,UserListModel,UserDetailModel,UserEntityMapper>
+public class UserFacade : FacadeBase<UserEntity,UserListModel,UserDetailModel,UserEntityMapper>, IUserFacade
 {
     public UserFacade(IUnitOfWorkFactory unitOfWorkFactory, IMapper modelMapper) : base(unitOfWorkFactory, modelMapper)
     {

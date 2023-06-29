@@ -85,11 +85,7 @@ void UseRouting(WebApplication app)
 
         app.MapPost($"{DebtBasePath}", (DebtDetailModel debt, IDebtFacade debtFacade) => debtFacade.SaveAsync(debt))
             .WithTags(DebtsTag)
-            .WithName($"Create{DebtBaseName}");
-
-        app.MapPut($"{DebtBasePath}", (DebtDetailModel debt, IDebtFacade debtFacade) => debtFacade.SaveAsync(debt))
-            .WithTags(DebtsTag)
-            .WithName($"Update{DebtBaseName}");
+            .WithName($"Save{DebtBaseName}");
 
         app.MapDelete($"{DebtBasePath}/{{id:guid}}", (Guid id, IDebtFacade debtFacade) => debtFacade.DeleteAsync(id))
             .WithTags(DebtsTag)
@@ -113,12 +109,7 @@ void UseRouting(WebApplication app)
         app.MapPost($"{GroupBasePath}",
                 (GroupDetailModel group, IGroupFacade groupFacade) => groupFacade.SaveAsync(group))
             .WithTags(GroupsTag)
-            .WithName($"Create{GroupBaseName}");
-
-        app.MapPut($"{GroupBasePath}",
-                (GroupDetailModel group, IGroupFacade groupFacade) => groupFacade.SaveAsync(group))
-            .WithTags(GroupsTag)
-            .WithName($"Update{GroupBaseName}");
+            .WithName($"Save{GroupBaseName}");
 
         app.MapDelete($"{GroupBasePath}/{{id:guid}}",
                 (Guid id, IGroupFacade groupFacade) => groupFacade.DeleteAsync(id))
@@ -142,11 +133,7 @@ void UseRouting(WebApplication app)
 
         app.MapPost($"{RegisteredGroupBasePath}", (RegisteredGroupModel registeredGroup, IRegisteredGroupFacade registeredGroupFacade) => registeredGroupFacade.SaveAsync(registeredGroup))
             .WithTags(RegisteredGroupTag)
-            .WithName($"Create{RegisteredGroupBaseName}");
-
-        app.MapPut($"{RegisteredGroupBasePath}", (RegisteredGroupModel registeredGroup, IRegisteredGroupFacade registeredGroupFacade) => registeredGroupFacade.SaveAsync(registeredGroup))
-            .WithTags(RegisteredGroupTag)
-            .WithName($"Update{RegisteredGroupBaseName}");
+            .WithName($"Save{RegisteredGroupBaseName}");
 
         app.MapDelete($"{RegisteredGroupBasePath}/{{id:guid}}", (Guid id, IRegisteredGroupFacade registeredGroupFacade) => registeredGroupFacade.DeleteAsync(id))
             .WithTags(RegisteredGroupTag)
@@ -169,11 +156,7 @@ void UseRouting(WebApplication app)
 
         app.MapPost($"{UserBasePath}", (UserDetailModel user, IUserFacade userFacade) => userFacade.SaveAsync(user))
             .WithTags(UsersTag)
-            .WithName($"Create{UserBaseName}");
-
-        app.MapPut($"{UserBasePath}", (UserDetailModel user, IUserFacade userFacade) => userFacade.SaveAsync(user))
-            .WithTags(UsersTag)
-            .WithName($"Update{UserBaseName}");
+            .WithName($"Save{UserBaseName}");
 
         app.MapDelete($"{UserBasePath}/{{id:guid}}", (Guid id, IUserFacade userFacade) => userFacade.DeleteAsync(id))
             .WithTags(UsersTag)

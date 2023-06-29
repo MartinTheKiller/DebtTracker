@@ -15,9 +15,4 @@
     <ProjectReference Include="..\DebtTracker.DAL\DebtTracker.DAL.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Facades\" />
-    <Folder Include="Facades\Interfaces\" />
-  </ItemGroup>
-
 </Project>

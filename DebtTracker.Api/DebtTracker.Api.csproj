@@ -14,6 +14,11 @@
 
   <ItemGroup>
     <ProjectReference Include="..\DebtTracker.BL\DebtTracker.BL.csproj" />
+    <ProjectReference Include="..\DebtTracker.DAL\DebtTracker.DAL.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Options\" />
   </ItemGroup>
 
 </Project>

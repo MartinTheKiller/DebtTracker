@@ -4,6 +4,7 @@ public record DALOptions
 {
     public SqLiteOptions? SqLite { get; init; }
     public SqlServerOptions? SqlServer { get; init; }
+    public MySqlOptions? MySql { get; init; }
 }
 
 public record SqLiteOptions
@@ -26,4 +27,12 @@ public record SqlServerOptions
 {
     public bool Enabled { get; init; }
     public string ConnectionString { get; init; } = null!;
+}
+
+public record MySqlOptions
+{
+    public bool Enabled { get; init; }
+    public string ConnectionString { get; init; } = null!;
+    public string ServerVersion { get; init; } = null!;
+    public bool UseMariaDbServer { get; init; }
 }

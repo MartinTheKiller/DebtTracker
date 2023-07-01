@@ -1,17 +1,22 @@
+using System.Text;
 using AutoMapper;
 using DebtTracker.BL.Facades;
 using DebtTracker.BL.Models;
-using Microsoft.AspNetCore.Builder;
 using System.Text.Json.Serialization;
 using DebtTracker.Api;
+using DebtTracker.Api.Options;
 using DebtTracker.BL;
-using DebtTracker.DAL;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Json;
+using Microsoft.IdentityModel.Tokens;
 using NSwag.AspNetCore;
+using NSwag.Generation.Processors.Security;
+using NSwag;
 
 var builder = WebApplication.CreateBuilder(args);
 
-ConfigureOpenApiDocuments(builder.Services);
+ConfigureOpenApiDocuments(builder.Services, builder.Configuration);
 builder.Services.AddBLServices()
                 .AddDALServices(builder.Configuration)
                 .AddAutoMapper(typeof(BLInstaller));
@@ -23,25 +28,72 @@ builder.Services.Configure<Microsoft.AspNetCore.Mvc.JsonOptions>(options =>
 {
     options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
 });
+ConfigureSecurityFeatures(builder.Services, builder.Configuration);
 
 var application = builder.Build();
 
 ValidateAutoMapperConfiguration(application.Services);
-UseSecurityFeatures(application);
 UseRouting(application);
 UseOpenApi(application);
+UseSecurityFeatures(application, builder.Configuration); // UseSecurityFeatures is called after UseOpenApi to make swaggerUi accessible without authentication
 
 application.Run();
 
 
-void ConfigureOpenApiDocuments(IServiceCollection services)
+void ConfigureOpenApiDocuments(IServiceCollection services, IConfiguration configuration)
 {
     services.AddEndpointsApiExplorer();
+
+    bool useJwt = bool.Parse(configuration["Jwt:Enabled"]!);
+
     services.AddOpenApiDocument(document =>
     {
         document.Title = "DebtTracker API";
         document.DocumentName = "debttracker-api";
+        if (useJwt)
+        {
+            document.AddSecurity("JWT", Enumerable.Empty<string>(), new OpenApiSecurityScheme
+            {
+                Type = OpenApiSecuritySchemeType.ApiKey,
+                Name = "Authorization",
+                In = OpenApiSecurityApiKeyLocation.Header,
+                Description = "Input: Bearer {your JWT token}."
+            });
+
+            document.OperationProcessors.Add(new AspNetCoreOperationSecurityScopeProcessor("JWT"));
+        }
     });
+}
+
+void ConfigureSecurityFeatures(IServiceCollection services, IConfiguration configuration)
+{
+    JwtOptions jwtOptions = new();
+    configuration.GetSection("Jwt").Bind(jwtOptions);
+
+    if (jwtOptions.Enabled)
+    {
+        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            .AddJwtBearer(options =>
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidIssuer = jwtOptions.Issuer,
+                    ValidAudience = jwtOptions.Audience,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.Key))
+                });
+
+        services.AddAuthorization(options =>
+        {
+            // All endpoints require authentication by default
+            options.FallbackPolicy = new AuthorizationPolicyBuilder()
+                .AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme)
+                .RequireAuthenticatedUser()
+                .Build();
+        });
+    }
 }
 
 void ValidateAutoMapperConfiguration(IServiceProvider serviceProvider)
@@ -50,9 +102,16 @@ void ValidateAutoMapperConfiguration(IServiceProvider serviceProvider)
     mapper.ConfigurationProvider.AssertConfigurationIsValid();
 }
 
-void UseSecurityFeatures(IApplicationBuilder app)
+void UseSecurityFeatures(IApplicationBuilder app, IConfiguration configuration)
 {
     app.UseHttpsRedirection();
+
+    bool useJwt = bool.Parse(configuration["Jwt:Enabled"]!);
+    if (useJwt)
+    {
+        app.UseAuthentication();
+        app.UseAuthorization();
+    }
 }
 
 void UseRouting(WebApplication app)
@@ -61,7 +120,7 @@ void UseRouting(WebApplication app)
     {
         http.Response.Redirect("/swagger", false);
         return Task.CompletedTask;
-    });
+    }).AllowAnonymous();
 
     UseDebtRouting(app);
     UseGroupRouting(app);

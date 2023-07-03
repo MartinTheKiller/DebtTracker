@@ -1,3 +1,5 @@
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using System.Text;
 using AutoMapper;
 using DebtTracker.BL.Facades;
@@ -33,7 +35,7 @@ ConfigureSecurityFeatures(builder.Services, builder.Configuration);
 var application = builder.Build();
 
 ValidateAutoMapperConfiguration(application.Services);
-UseRouting(application);
+UseRouting(application, builder.Configuration);
 UseOpenApi(application);
 UseSecurityFeatures(application, builder.Configuration); // UseSecurityFeatures is called after UseOpenApi to make swaggerUi accessible without authentication
 
@@ -70,30 +72,33 @@ void ConfigureSecurityFeatures(IServiceCollection services, IConfiguration confi
     JwtOptions jwtOptions = new();
     configuration.GetSection("Jwt").Bind(jwtOptions);
 
-    if (jwtOptions.Enabled)
-    {
-        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-            .AddJwtBearer(options =>
-                options.TokenValidationParameters = new TokenValidationParameters
-                {
-                    ValidateIssuer = true,
-                    ValidateAudience = true,
-                    ValidateLifetime = true,
-                    ValidateIssuerSigningKey = true,
-                    ValidIssuer = jwtOptions.Issuer,
-                    ValidAudience = jwtOptions.Audience,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.Key))
-                });
+    if (!jwtOptions.Enabled) return;
 
-        services.AddAuthorization(options =>
+    services.AddAuthentication(scheme =>
         {
-            // All endpoints require authentication by default
-            options.FallbackPolicy = new AuthorizationPolicyBuilder()
-                .AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme)
-                .RequireAuthenticatedUser()
-                .Build();
-        });
-    }
+            scheme.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            scheme.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        })
+        .AddJwtBearer(options =>
+            options.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
+                ValidIssuer = jwtOptions.Issuer,
+                ValidAudience = jwtOptions.Audience,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.Key))
+            });
+
+    services.AddAuthorization(options =>
+    {
+        // All endpoints require authentication by default
+        options.FallbackPolicy = new AuthorizationPolicyBuilder()
+            .AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme)
+            .RequireAuthenticatedUser()
+            .Build();
+    });
 }
 
 void ValidateAutoMapperConfiguration(IServiceProvider serviceProvider)
@@ -114,7 +119,7 @@ void UseSecurityFeatures(IApplicationBuilder app, IConfiguration configuration)
     }
 }
 
-void UseRouting(WebApplication app)
+void UseRouting(WebApplication app, IConfiguration configuration)
 {
     app.MapGet("/", http =>
     {
@@ -126,6 +131,7 @@ void UseRouting(WebApplication app)
     UseGroupRouting(app);
     UseRegisteredGroupRouting(app);
     UseUserRouting(app);
+    UseAuthenticationRouting(app, configuration);
 
 
     void UseDebtRouting(WebApplication app)
@@ -220,6 +226,47 @@ void UseRouting(WebApplication app)
         app.MapDelete($"{UserBasePath}/{{id:guid}}", (Guid id, IUserFacade userFacade) => userFacade.DeleteAsync(id))
             .WithTags(UsersTag)
             .WithName($"Delete{UserBaseName}");
+    }
+
+    void UseAuthenticationRouting(WebApplication app, IConfiguration configuration)
+    {
+        const string AuthenticationBasePath = "/DebtTrackerApi/Authentication";
+        const string AuthenticationBaseName = "Authentication";
+        const string AuthenticationTag = "Authentication";
+
+        JwtOptions jwtOptions = new();
+        configuration.GetSection("Jwt").Bind(jwtOptions);
+
+        if(!jwtOptions.Enabled) return;
+
+        app.MapPost($"{AuthenticationBasePath}/Login", async (UserLoginModel loginModel, IUserFacade userFacade) => 
+            {
+                var loggedUser = await userFacade.GetAsync(loginModel);
+                if (loggedUser is null)
+                    return Results.NotFound();
+                
+                var claims = new[]
+                {
+                    new Claim("UserId", loggedUser.Id.ToString()),
+                    new Claim(ClaimTypes.Email, loginModel.Email),
+                    new Claim(ClaimTypes.Role, "User")
+                };
+
+                var token = new JwtSecurityToken
+                (
+                    issuer: jwtOptions.Issuer,
+                    audience: jwtOptions.Audience,
+                    claims: claims,
+                    expires: DateTime.Now.AddMinutes(30),
+                    notBefore: DateTime.Now,
+                    signingCredentials: new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.Key)), SecurityAlgorithms.HmacSha256)
+                );
+
+                return Results.Ok(new JwtSecurityTokenHandler().WriteToken(token));
+            })
+            .WithTags(AuthenticationTag)
+            .WithName($"Login{AuthenticationBaseName}")
+            .AllowAnonymous();
     }
 }
 

@@ -32,5 +32,6 @@ public class AutoMapperProfile : Profile
             .ForMember(m => m.Groups, expr => expr.Ignore())
             .ReverseMap();
         CreateMap<UserEntity, UserListModel>();
+        CreateMap<UserEntity, UserLoginModel>();
     }
 }

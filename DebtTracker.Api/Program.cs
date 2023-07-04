@@ -6,11 +6,13 @@ using DebtTracker.BL.Facades;
 using DebtTracker.BL.Models;
 using System.Text.Json.Serialization;
 using DebtTracker.Api;
+using DebtTracker.Api.Messages;
 using DebtTracker.Api.Options;
 using DebtTracker.BL;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Json;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using NSwag.AspNetCore;
 using NSwag.Generation.Processors.Security;
@@ -231,7 +233,6 @@ void UseRouting(WebApplication app, IConfiguration configuration)
     void UseAuthenticationRouting(WebApplication app, IConfiguration configuration)
     {
         const string AuthenticationBasePath = "/DebtTrackerApi/Authentication";
-        const string AuthenticationBaseName = "Authentication";
         const string AuthenticationTag = "Authentication";
 
         JwtOptions jwtOptions = new();
@@ -239,33 +240,36 @@ void UseRouting(WebApplication app, IConfiguration configuration)
 
         if(!jwtOptions.Enabled) return;
 
-        app.MapPost($"{AuthenticationBasePath}/Login", async (UserLoginModel loginModel, IUserFacade userFacade) => 
+        app.MapPost($"{AuthenticationBasePath}/Authenticate", 
+                async (AuthenticateRequest authenticateRequest, IUserFacade userFacade) => 
             {
-                var loggedUser = await userFacade.GetAsync(loginModel);
-                if (loggedUser is null)
-                    return Results.NotFound();
+                var loggedUserId = await userFacade.LoginAsync(authenticateRequest.Email, authenticateRequest.Password);
+                if (loggedUserId is null)
+                    return Results.BadRequest("Wrong email or password");
                 
-                var claims = new[]
-                {
-                    new Claim("UserId", loggedUser.Id.ToString()),
-                    new Claim(ClaimTypes.Email, loginModel.Email),
-                    new Claim(ClaimTypes.Role, "User")
-                };
-
-                var token = new JwtSecurityToken
+                var accessToken = new JwtSecurityToken
                 (
                     issuer: jwtOptions.Issuer,
                     audience: jwtOptions.Audience,
-                    claims: claims,
-                    expires: DateTime.Now.AddMinutes(30),
+                    claims: new[]
+                    {
+                        new Claim("UserId", loggedUserId.ToString()!),
+                        new Claim(ClaimTypes.Role, "User")
+                    },
+                    expires: DateTime.Now.AddSeconds(jwtOptions.AccessTokenLifetime),
                     notBefore: DateTime.Now,
                     signingCredentials: new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.Key)), SecurityAlgorithms.HmacSha256)
                 );
 
-                return Results.Ok(new JwtSecurityTokenHandler().WriteToken(token));
+                var response = new AuthenticateResponse
+                {
+                    AccessToken = new JwtSecurityTokenHandler().WriteToken(accessToken)
+                };
+
+                return Results.Ok(response);
             })
             .WithTags(AuthenticationTag)
-            .WithName($"Login{AuthenticationBaseName}")
+            .WithName($"Authenticate")
             .AllowAnonymous();
     }
 }

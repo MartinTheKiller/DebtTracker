@@ -122,6 +122,11 @@ namespace DebtTracker.DAL.Migrations.SqlServer
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
+                    b.Property<string>("HashedPassword")
+                        .IsRequired()
+                        .HasMaxLength(60)
+                        .HasColumnType("nvarchar(60)");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(50)

@@ -16,7 +16,7 @@ public record UserEntity : IEntity
     [MaxLength(500)]
     public string? PhotoUri { get; set; }
     [MaxLength(60)]
-    public required string HashedPassword { get; init; }    // 60 characters is enough for bcrypt
+    public required string HashedPassword { get; set; }    // 60 characters is enough for bcrypt
 
     public ICollection<DebtEntity> OwesDebts { get; set; } = new List<DebtEntity>();
     public ICollection<DebtEntity> LentDebts { get; set; } = new List<DebtEntity>();

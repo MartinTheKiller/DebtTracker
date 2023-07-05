@@ -1,7 +1,9 @@
 ﻿using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
+using DebtTracker.BL.Models.Debt;
+using DebtTracker.BL.Models.RegisteredGroup;
 
-namespace DebtTracker.BL.Models;
+namespace DebtTracker.BL.Models.Group;
 
 public record GroupDetailModel : ModelBase
 {

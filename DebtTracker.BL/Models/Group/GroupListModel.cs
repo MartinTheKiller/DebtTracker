@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace DebtTracker.BL.Models;
+﻿namespace DebtTracker.BL.Models.Group;
 
 public record GroupListModel : ModelBase
 {

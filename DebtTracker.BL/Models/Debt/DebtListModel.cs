@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace DebtTracker.BL.Models;
+﻿namespace DebtTracker.BL.Models.Debt;
 
 public record DebtListModel : ModelBase
 {

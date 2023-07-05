@@ -1,4 +1,7 @@
-﻿namespace DebtTracker.BL.Models;
+﻿using DebtTracker.BL.Models.Group;
+using DebtTracker.BL.Models.User;
+
+namespace DebtTracker.BL.Models.RegisteredGroup;
 
 public record RegisteredGroupModel : ModelBase
 {

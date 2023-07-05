@@ -12,7 +12,8 @@ public static class UserSeeds
         Surname = "NoMoney",
         Email = "MartenNoMoney@email.com",
         BankAccount = "123456/1234",
-        PhotoUri = null
+        PhotoUri = null,
+        HashedPassword = "$2a$10$CMRZOYCWjOa8qztdPYY3S.wsBZmLIIWyf3KQVbeQ3ccbBo9gqcRDG" //Password123
     };
 
     public static readonly UserEntity UserCreditorEntity = new()
@@ -22,7 +23,8 @@ public static class UserSeeds
         Surname = "HasMoney",
         Email = "MartenHasMoney@email.com",
         BankAccount = "654321/4321",
-        PhotoUri = null
+        PhotoUri = null,
+        HashedPassword = "$2a$10$CMRZOYCWjOa8qztdPYY3S.wsBZmLIIWyf3KQVbeQ3ccbBo9gqcRDG" //Password123
     };
 
     public static readonly UserEntity UserToUpdateEntity = UserDebtorEntity with { Id = Guid.Parse("6f11c8ab-e99d-4abd-87d4-ecf26874d11d"), 

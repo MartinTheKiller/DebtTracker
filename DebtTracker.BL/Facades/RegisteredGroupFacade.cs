@@ -1,13 +1,14 @@
 ﻿using AutoMapper;
 using CubiTracker.DAL.Repositories;
 using DebtTracker.BL.Models;
+using DebtTracker.BL.Models.RegisteredGroup;
 using DebtTracker.DAL.Entities;
 using DebtTracker.DAL.Mappers;
 using DebtTracker.DAL.UnitOfWork;
 
 namespace DebtTracker.BL.Facades;
 
-public class RegisteredGroupFacade : FacadeBase<RegisteredGroupEntity, RegisteredGroupModel, RegisteredGroupModel, RegisteredGroupEntityMapper>, IRegisteredGroupFacade
+public class RegisteredGroupFacade : FacadeBase<RegisteredGroupEntity, RegisteredGroupModel, RegisteredGroupModel, RegisteredGroupModel, RegisteredGroupModel, RegisteredGroupEntityMapper>, IRegisteredGroupFacade
 {
     public RegisteredGroupFacade(IUnitOfWorkFactory unitOfWorkFactory, IMapper modelMapper) : base(unitOfWorkFactory, modelMapper)
     {
@@ -23,4 +24,7 @@ public class RegisteredGroupFacade : FacadeBase<RegisteredGroupEntity, Registere
 
         return await base.SaveAsync(model);
     }
+
+    public new Task<RegisteredGroupModel> UpdateAsync(RegisteredGroupModel model) => 
+        throw new InvalidOperationException("Group registrations are not meant to be updated");
 }

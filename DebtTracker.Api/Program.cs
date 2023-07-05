@@ -9,6 +9,10 @@ using DebtTracker.Api;
 using DebtTracker.Api.Messages;
 using DebtTracker.Api.Options;
 using DebtTracker.BL;
+using DebtTracker.BL.Models.Debt;
+using DebtTracker.BL.Models.Group;
+using DebtTracker.BL.Models.RegisteredGroup;
+using DebtTracker.BL.Models.User;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Json;
@@ -216,14 +220,18 @@ void UseRouting(WebApplication app, IConfiguration configuration)
         app.MapGet($"{UserBasePath}", (IUserFacade userFacade) => userFacade.GetAsync())
             .WithTags(UsersTag)
             .WithName($"Get{UserBaseName}sAll");
-
+        
         app.MapGet($"{UserBasePath}/{{id:guid}}", (Guid id, IUserFacade userFacade) => userFacade.GetAsync(id))
             .WithTags(UsersTag)
             .WithName($"Get{UserBaseName}ById");
 
-        app.MapPost($"{UserBasePath}", (UserDetailModel user, IUserFacade userFacade) => userFacade.SaveAsync(user))
+        app.MapPost($"{UserBasePath}", (UserCreateModel user, IUserFacade userFacade) => userFacade.CreateAsync(user))
             .WithTags(UsersTag)
-            .WithName($"Save{UserBaseName}");
+            .WithName($"Create{UserBaseName}");
+
+        app.MapPut($"{UserBasePath}", (UserDetailModel user, IUserFacade userFacade) => userFacade.UpdateAsync(user))
+            .WithTags(UsersTag)
+            .WithName($"Update{UserBaseName}");
 
         app.MapDelete($"{UserBasePath}/{{id:guid}}", (Guid id, IUserFacade userFacade) => userFacade.DeleteAsync(id))
             .WithTags(UsersTag)

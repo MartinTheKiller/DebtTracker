@@ -21,7 +21,8 @@ public class DbContextUserTests : DbContextTestsBase
             Id = Guid.NewGuid(),
             Name = "User",
             Surname = "New",
-            Email = "usernew@new.com"
+            Email = "usernew@new.com",
+            HashedPassword = "$2a$10$CMRZOYCWjOa8qztdPYY3S.wsBZmLIIWyf3KQVbeQ3ccbBo9gqcRDG" //Password123
         };
 
         // Act

@@ -1,10 +1,14 @@
-﻿using DebtTracker.DAL.Entities;
+﻿using DebtTracker.BL.Hashers;
+using DebtTracker.DAL.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace DebtTracker.Common.Tests.Seeds;
 
 public static class UserSeeds
 {
+    public const string DefaultPassword = "Password123";
+    private static readonly UserPasswordHasher _passwordHasher = new();
+
     public static readonly UserEntity UserDebtorEntity = new()
     {
         Id = Guid.Parse("1a2b20f1-a388-4f7e-899d-1bb812cf96e0"),
@@ -13,7 +17,7 @@ public static class UserSeeds
         Email = "MartenNoMoney@email.com",
         BankAccount = "123456/1234",
         PhotoUri = null,
-        HashedPassword = "$2a$10$CMRZOYCWjOa8qztdPYY3S.wsBZmLIIWyf3KQVbeQ3ccbBo9gqcRDG" //Password123
+        HashedPassword = _passwordHasher.HashPassword(DefaultPassword)
     };
 
     public static readonly UserEntity UserCreditorEntity = new()
@@ -24,7 +28,7 @@ public static class UserSeeds
         Email = "MartenHasMoney@email.com",
         BankAccount = "654321/4321",
         PhotoUri = null,
-        HashedPassword = "$2a$10$CMRZOYCWjOa8qztdPYY3S.wsBZmLIIWyf3KQVbeQ3ccbBo9gqcRDG" //Password123
+        HashedPassword = _passwordHasher.HashPassword(DefaultPassword)
     };
 
     public static readonly UserEntity UserToUpdateEntity = UserDebtorEntity with { Id = Guid.Parse("6f11c8ab-e99d-4abd-87d4-ecf26874d11d"), 
@@ -43,6 +47,10 @@ public static class UserSeeds
                                                                                            Groups = new List<RegisteredGroupEntity>(), 
                                                                                            LentDebts = new List<DebtEntity>(), 
                                                                                            OwesDebts = new List<DebtEntity>()};
+    public static readonly UserEntity UserToChangePasswordEntity = UserDebtorEntity with { Id = Guid.Parse("c3361cda-d21a-42d6-9b6f-a4d275be5eb8"),
+                                                                                            Groups = new List<RegisteredGroupEntity>(),
+                                                                                            LentDebts = new List<DebtEntity>(),
+                                                                                            OwesDebts = new List<DebtEntity>()};
 
     public static void Seed(ModelBuilder modelBuilder) =>
         modelBuilder.Entity<UserEntity>().HasData(
@@ -51,6 +59,7 @@ public static class UserSeeds
             UserToUpdateEntity with { Groups = new List<RegisteredGroupEntity>(), LentDebts = new List<DebtEntity>(), OwesDebts = new List<DebtEntity>() },
             UserToDeleteEntity with { Groups = new List<RegisteredGroupEntity>(), LentDebts = new List<DebtEntity>(), OwesDebts = new List<DebtEntity>() },
             UserToRegisterEntity with { Groups = new List<RegisteredGroupEntity>(), LentDebts = new List<DebtEntity>(), OwesDebts = new List<DebtEntity>() },
-            UserToDeleteCascadeEntity with { Groups = new List<RegisteredGroupEntity>(), LentDebts = new List<DebtEntity>(), OwesDebts = new List<DebtEntity>() }
+            UserToDeleteCascadeEntity with { Groups = new List<RegisteredGroupEntity>(), LentDebts = new List<DebtEntity>(), OwesDebts = new List<DebtEntity>() },
+            UserToChangePasswordEntity with { Groups = new List<RegisteredGroupEntity>(), LentDebts = new List<DebtEntity>(), OwesDebts = new List<DebtEntity>() }
         );
 }

@@ -14,11 +14,12 @@ namespace DebtTracker.BL.Tests;
 public class UserFacadeTests : FacadeTestsBase
 {
     private readonly UserFacade FacadeSUT;
+    private readonly IUserPasswordHasher _passwordHasher;
 
     public UserFacadeTests(ITestOutputHelper output) : base(output)
     {
-        IUserPasswordHasher passwordHasher = new UserPasswordHasher();
-        FacadeSUT = new UserFacade(UnitOfWorkFactory, Mapper, passwordHasher);
+        _passwordHasher = new UserPasswordHasher();
+        FacadeSUT = new UserFacade(UnitOfWorkFactory, Mapper, _passwordHasher);
     }
 
     [Fact]
@@ -31,7 +32,7 @@ public class UserFacadeTests : FacadeTestsBase
             Name = "User",
             Surname = "New",
             Email = "usernew@new.com",
-            HashedPassword = "$2a$10$CMRZOYCWjOa8qztdPYY3S.wsBZmLIIWyf3KQVbeQ3ccbBo9gqcRDG" //Password123
+            HashedPassword = _passwordHasher.HashPassword(UserSeeds.DefaultPassword)
         };
 
         // Act
@@ -53,7 +54,7 @@ public class UserFacadeTests : FacadeTestsBase
             Name = "User",
             Surname = "New",
             Email = "usernew@new.com",
-            HashedPassword = "$2a$10$CMRZOYCWjOa8qztdPYY3S.wsBZmLIIWyf3KQVbeQ3ccbBo9gqcRDG" //Password123
+            HashedPassword = _passwordHasher.HashPassword(UserSeeds.DefaultPassword)
         };
 
         // Act
@@ -75,7 +76,7 @@ public class UserFacadeTests : FacadeTestsBase
             Name = "User",
             Surname = "New",
             Email = "usernew@new.com",
-            HashedPassword = "$2a$10$CMRZOYCWjOa8qztdPYY3S.wsBZmLIIWyf3KQVbeQ3ccbBo9gqcRDG" //Password123
+            HashedPassword = _passwordHasher.HashPassword(UserSeeds.DefaultPassword)
         };
 
         // Act
@@ -97,7 +98,7 @@ public class UserFacadeTests : FacadeTestsBase
             Name = "User",
             Surname = "New",
             Email = "usernew@new.com",
-            HashedPassword = "$2a$10$CMRZOYCWjOa8qztdPYY3S.wsBZmLIIWyf3KQVbeQ3ccbBo9gqcRDG" //Password123
+            HashedPassword = _passwordHasher.HashPassword(UserSeeds.DefaultPassword)
         };
 
         // Act
@@ -125,7 +126,7 @@ public class UserFacadeTests : FacadeTestsBase
     {
         // Act
         var updatedUser = await FacadeSUT.GetAsync(UserSeeds.UserToUpdateEntity.Id);
-        updatedUser.Name = "Updated";
+        updatedUser!.Name = "Updated";
         await FacadeSUT.UpdateAsync(updatedUser);
         UserSeeds.UserToUpdateEntity.Name = "Updated";
 
@@ -146,5 +147,54 @@ public class UserFacadeTests : FacadeTestsBase
         await using var dbx = await DbContextFactory.CreateDbContextAsync();
         var actualUser = await dbx.Users.SingleOrDefaultAsync(i => i.Id == UserSeeds.UserToDeleteEntity.Id);
         Assert.Null(actualUser);
+    }
+
+    [Fact]
+    public async Task SeededUser_CorrectLogin_UserId()
+    {
+        // Act
+        var userId = await FacadeSUT.LoginAsync(UserSeeds.UserCreditorEntity.Email, UserSeeds.DefaultPassword);
+
+        // Assert
+        Assert.NotNull(userId);
+        Assert.Equal(UserSeeds.UserCreditorEntity.Id, userId);
+    }
+
+    [Fact]
+    public async Task SeededUser_IncorrectLogin_Null()
+    {
+        // Act
+        var userId = await FacadeSUT.LoginAsync(UserSeeds.UserCreditorEntity.Email, "Wrong" + UserSeeds.DefaultPassword);
+
+        // Assert
+        Assert.Null(userId);
+    }
+
+    [Fact]
+    public async Task SeededUser_ChangePasswordCorrectOldPassword_PasswordChanged()
+    {
+        // Act
+        const string newPassword = "New" + UserSeeds.DefaultPassword;
+        var result = await FacadeSUT.ChangePasswordAsync(UserSeeds.UserToChangePasswordEntity.Id, UserSeeds.DefaultPassword, newPassword);
+        
+        // Assert
+        Assert.True(result);
+        await using var dbx = await DbContextFactory.CreateDbContextAsync();
+        var actualUser = await dbx.Users.SingleAsync(i => i.Id == UserSeeds.UserToChangePasswordEntity.Id);
+        Assert.True(_passwordHasher.VerifyHashedPassword(newPassword, actualUser.HashedPassword));
+    }
+
+    [Fact]
+    public async Task SeededUser_ChangePasswordIncorrectOldPassword_PasswordNotChanged()
+    {
+        // Act
+        const string newPassword = "New" + UserSeeds.DefaultPassword;
+        var result = await FacadeSUT.ChangePasswordAsync(UserSeeds.UserToChangePasswordEntity.Id, "Wrong" + UserSeeds.DefaultPassword, newPassword);
+
+        // Assert
+        Assert.False(result);
+        await using var dbx = await DbContextFactory.CreateDbContextAsync();
+        var actualUser = await dbx.Users.SingleAsync(i => i.Id == UserSeeds.UserToChangePasswordEntity.Id);
+        Assert.True(_passwordHasher.VerifyHashedPassword(UserSeeds.DefaultPassword, actualUser.HashedPassword));
     }
 }

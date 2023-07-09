@@ -6,6 +6,8 @@ using DebtTracker.BL.Facades;
 using DebtTracker.BL.Models;
 using System.Text.Json.Serialization;
 using DebtTracker.Api;
+using DebtTracker.Api.Handlers;
+using DebtTracker.Api.Identity;
 using DebtTracker.Api.Messages;
 using DebtTracker.Api.Options;
 using DebtTracker.BL;
@@ -248,10 +250,10 @@ void UseRouting(WebApplication app, IConfiguration configuration)
 
         if(!jwtOptions.Enabled) return;
 
-        app.MapPost($"{AuthenticationBasePath}/Authenticate", 
-                async (AuthenticateRequest authenticateRequest, IUserFacade userFacade) => 
+        app.MapPost($"{AuthenticationBasePath}/", 
+                async (AuthenticateRequest request, IUserFacade userFacade) => 
             {
-                var loggedUserId = await userFacade.LoginAsync(authenticateRequest.Email, authenticateRequest.Password);
+                var loggedUserId = await userFacade.LoginAsync(request.Email, request.Password);
                 if (loggedUserId is null)
                     return Results.BadRequest("Wrong email or password");
                 
@@ -261,8 +263,8 @@ void UseRouting(WebApplication app, IConfiguration configuration)
                     audience: jwtOptions.Audience,
                     claims: new[]
                     {
-                        new Claim("UserId", loggedUserId.ToString()!),
-                        new Claim(ClaimTypes.Role, "User")
+                        new Claim(IdentityData.UserIdClaimName, loggedUserId.ToString()!),
+                        new Claim(ClaimTypes.Role, IdentityData.UserRoleClaimValue)
                     },
                     expires: DateTime.Now.AddSeconds(jwtOptions.AccessTokenLifetime),
                     notBefore: DateTime.Now,
@@ -279,6 +281,11 @@ void UseRouting(WebApplication app, IConfiguration configuration)
             .WithTags(AuthenticationTag)
             .WithName($"Authenticate")
             .AllowAnonymous();
+
+        app.MapPut($"{AuthenticationBasePath}/", (ChangePasswordRequest request, IUserFacade userFacade, HttpContext context) => 
+                userFacade.ChangePasswordAsync(context.GetUserId(), request.OldPassword, request.NewPassword))
+        .WithTags(AuthenticationTag)
+        .WithName($"ChangePassword");
     }
 }
 

@@ -57,4 +57,26 @@ public class UserFacade : FacadeBase<UserEntity, UserListModel, UserDetailModel,
 
         return passwordMatches ? userPasswordModel.Id : null;
     }
+
+    public async Task<bool> ChangePasswordAsync(Guid id, string oldPassword, string newPassword)
+    {
+        await using IUnitOfWork uow = UnitOfWorkFactory.Create();
+        IRepository<UserEntity> repository = uow.GetRepository<UserEntity, UserEntityMapper>();
+
+        IQueryable<UserEntity> query = repository.Get().Where(e => e.Id == id);
+
+        UserEntity? entity = await query.SingleOrDefaultAsync().ConfigureAwait(false);
+
+        if (entity is null) return false;
+
+        bool passwordMatches = _passwordHasher.VerifyHashedPassword(oldPassword, entity.HashedPassword);
+
+        if (!passwordMatches) return false;
+
+        entity.HashedPassword = _passwordHasher.HashPassword(newPassword);
+
+        await uow.CommitAsync();
+
+        return true;
+    }
 }

@@ -5,7 +5,7 @@ namespace DebtTracker.BL.Models.User;
 public record UserPasswordModel : ModelBase
 {
     [MaxLength(60)]
-    public required string HashedPassword { get; init; } = string.Empty;
+    public required string HashedPassword { get; set; } = string.Empty;
 
     public static UserPasswordModel Empty => new()
     {

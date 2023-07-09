@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DebtTracker.DAL.Migrations.MySql
 {
     [DbContext(typeof(MySqlDbContext))]
-    [Migration("20230629190036_Initial MySql")]
+    [Migration("20230704181218_Initial MySql")]
     partial class InitialMySql
     {
         /// <inheritdoc />
@@ -121,6 +121,11 @@ namespace DebtTracker.DAL.Migrations.MySql
                         .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("varchar(200)");
+
+                    b.Property<string>("HashedPassword")
+                        .IsRequired()
+                        .HasMaxLength(60)
+                        .HasColumnType("varchar(60)");
 
                     b.Property<string>("Name")
                         .IsRequired()

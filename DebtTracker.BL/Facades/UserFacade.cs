@@ -1,5 +1,8 @@
 ﻿using AutoMapper;
+using CubiTracker.DAL.Repositories;
+using DebtTracker.BL.Hashers;
 using DebtTracker.BL.Models;
+using DebtTracker.BL.Models.User;
 using DebtTracker.DAL.Entities;
 using DebtTracker.DAL.Mappers;
 using DebtTracker.DAL.UnitOfWork;
@@ -7,19 +10,73 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DebtTracker.BL.Facades;
 
-public class UserFacade : FacadeBase<UserEntity,UserListModel,UserDetailModel,UserEntityMapper>, IUserFacade
+public class UserFacade : FacadeBase<UserEntity, UserListModel, UserDetailModel, UserCreateModel, UserDetailModel, UserEntityMapper>, IUserFacade
 {
-    public UserFacade(IUnitOfWorkFactory unitOfWorkFactory, IMapper modelMapper) : base(unitOfWorkFactory, modelMapper)
+    private readonly IUserPasswordHasher _passwordHasher;
+
+    public UserFacade(IUnitOfWorkFactory unitOfWorkFactory, IMapper modelMapper, IUserPasswordHasher passwordHasher) : base(unitOfWorkFactory, modelMapper)
     {
+        _passwordHasher = passwordHasher;
     }
 
-    public async Task<UserLoginModel?> GetAsync(UserLoginModel model)
+    public new async Task<UserDetailModel> UpdateAsync(UserDetailModel model)
+    {
+        GuardCollectionsAreNotSet(model);
+
+        UserEntity entity = ModelMapper.Map<UserEntity>(model);
+
+        await using IUnitOfWork uow = UnitOfWorkFactory.Create();
+        IRepository<UserEntity> repository = uow.GetRepository<UserEntity, UserEntityMapper>();
+
+        if (!await repository.ExistsAsync(entity))
+            throw new InvalidOperationException("Entity does not exists.");
+
+        IQueryable<UserEntity> query = repository.Get().Where(e => e.Id == entity.Id);
+        entity.HashedPassword = await query.Select(e => e.HashedPassword).SingleAsync();
+
+        UserEntity updatedEntity = await repository.UpdateAsync(entity);
+
+        await uow.CommitAsync();
+
+        return ModelMapper.Map<UserDetailModel>(updatedEntity);
+    }
+
+    public async Task<Guid?> LoginAsync(string email, string password)
     {
         await using IUnitOfWork uow = UnitOfWorkFactory.Create();
         IQueryable<UserEntity> query = uow
             .GetRepository<UserEntity, UserEntityMapper>()
             .Get()
-            .Where(e => e.Email == model.Email);
-        return await ModelMapper.ProjectTo<UserLoginModel>(query).SingleOrDefaultAsync().ConfigureAwait(false);
+            .Where(e => e.Email == email);
+
+        UserPasswordModel? userPasswordModel = await ModelMapper.ProjectTo<UserPasswordModel>(query).SingleOrDefaultAsync().ConfigureAwait(false);
+
+        if (userPasswordModel is null) return null;
+
+        bool passwordMatches = _passwordHasher.VerifyHashedPassword(password, userPasswordModel.HashedPassword);
+
+        return passwordMatches ? userPasswordModel.Id : null;
+    }
+
+    public async Task<bool> ChangePasswordAsync(Guid id, string oldPassword, string newPassword)
+    {
+        await using IUnitOfWork uow = UnitOfWorkFactory.Create();
+        IRepository<UserEntity> repository = uow.GetRepository<UserEntity, UserEntityMapper>();
+
+        IQueryable<UserEntity> query = repository.Get().Where(e => e.Id == id);
+
+        UserEntity? entity = await query.SingleOrDefaultAsync().ConfigureAwait(false);
+
+        if (entity is null) return false;
+
+        bool passwordMatches = _passwordHasher.VerifyHashedPassword(oldPassword, entity.HashedPassword);
+
+        if (!passwordMatches) return false;
+
+        entity.HashedPassword = _passwordHasher.HashPassword(newPassword);
+
+        await uow.CommitAsync();
+
+        return true;
     }
 }

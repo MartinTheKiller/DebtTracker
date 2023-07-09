@@ -12,7 +12,8 @@ public static class UserSeeds
         Surname = "NoMoney",
         BankAccount = "123456/1234",
         Email = "MartenNoMoney@email.com",
-        PhotoUri = null
+        PhotoUri = null,
+        HashedPassword = "$2a$10$CMRZOYCWjOa8qztdPYY3S.wsBZmLIIWyf3KQVbeQ3ccbBo9gqcRDG" //Password123
     };
 
     public static readonly UserEntity UserCreditorEntity = new()
@@ -22,7 +23,8 @@ public static class UserSeeds
         Surname = "HasMoney",
         BankAccount = "654321/4321",
         Email = "MartenHasMoney@email.com",
-        PhotoUri = null
+        PhotoUri = null,
+        HashedPassword = "$2a$10$CMRZOYCWjOa8qztdPYY3S.wsBZmLIIWyf3KQVbeQ3ccbBo9gqcRDG" //Password123
     };
 
     public static void Seed(ModelBuilder modelBuilder) =>

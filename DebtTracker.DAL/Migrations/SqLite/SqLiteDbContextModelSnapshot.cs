@@ -117,6 +117,11 @@ namespace DebtTracker.DAL.Migrations.SqLite
                         .HasMaxLength(200)
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("HashedPassword")
+                        .IsRequired()
+                        .HasMaxLength(60)
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(50)

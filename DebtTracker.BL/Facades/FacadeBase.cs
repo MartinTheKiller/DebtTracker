@@ -10,10 +10,12 @@ using CubiTracker.DAL.Repositories;
 
 namespace DebtTracker.BL.Facades;
 
-public abstract class FacadeBase<TEntity, TListModel, TDetailModel, TEntityMapper> : IFacade<TEntity, TListModel, TDetailModel>
+public abstract class FacadeBase<TEntity, TListModel, TDetailModel, TCreateModel, TUpdateModel, TEntityMapper> : IFacade<TEntity, TListModel, TDetailModel, TCreateModel, TUpdateModel>
     where TEntity : class, IEntity
     where TListModel : class, IModel
     where TDetailModel : class, IModel
+    where TCreateModel : class, IModel
+    where TUpdateModel : class, IModel
     where TEntityMapper : IEntityMapper<TEntity>, new()
 {
     protected readonly IMapper ModelMapper;
@@ -53,7 +55,46 @@ public abstract class FacadeBase<TEntity, TListModel, TDetailModel, TEntityMappe
         return await ModelMapper.ProjectTo<TListModel>(query).ToListAsync().ConfigureAwait(false);
     }
 
-    public async Task<TDetailModel> SaveAsync(TDetailModel model)
+    public async Task<TDetailModel> CreateAsync(TCreateModel model)
+    {
+        GuardCollectionsAreNotSet(model);
+
+        TEntity entity = ModelMapper.Map<TEntity>(model);
+
+        await using IUnitOfWork uow = UnitOfWorkFactory.Create();
+        IRepository<TEntity> repository = uow.GetRepository<TEntity, TEntityMapper>();
+
+        if (await repository.ExistsAsync(entity))
+            throw new InvalidOperationException("Entity already exists.");
+
+        entity.Id = entity.Id == Guid.Empty ? Guid.NewGuid() : entity.Id;
+        TEntity insertedEntity = await repository.InsertAsync(entity);
+
+        await uow.CommitAsync();
+
+        return ModelMapper.Map<TDetailModel>(insertedEntity);
+    }
+
+    public async Task<TDetailModel> UpdateAsync(TUpdateModel model)
+    {
+        GuardCollectionsAreNotSet(model);
+
+        TEntity entity = ModelMapper.Map<TEntity>(model);
+
+        await using IUnitOfWork uow = UnitOfWorkFactory.Create();
+        IRepository<TEntity> repository = uow.GetRepository<TEntity, TEntityMapper>();
+
+        if (!await repository.ExistsAsync(entity))
+            throw new InvalidOperationException("Entity does not exists.");
+
+        TEntity updatedEntity = await repository.UpdateAsync(entity);
+
+        await uow.CommitAsync();
+
+        return ModelMapper.Map<TDetailModel>(updatedEntity);
+    }
+
+    public virtual async Task<TDetailModel> SaveAsync(TCreateModel model)
     {
         TDetailModel result;
         GuardCollectionsAreNotSet(model);
@@ -86,7 +127,7 @@ public abstract class FacadeBase<TEntity, TListModel, TDetailModel, TEntityMappe
     /// </summary>
     /// <param name="model">Model to be inserted or updated</param>
     /// <exception cref="InvalidOperationException"></exception>
-    private static void GuardCollectionsAreNotSet(TDetailModel model)
+    protected static void GuardCollectionsAreNotSet(IModel model)
     {
         IEnumerable<PropertyInfo> collectionProperties = model
             .GetType()

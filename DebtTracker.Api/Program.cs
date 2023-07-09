@@ -282,8 +282,10 @@ void UseRouting(WebApplication app, IConfiguration configuration)
             .WithName($"Authenticate")
             .AllowAnonymous();
 
-        app.MapPut($"{AuthenticationBasePath}/", (ChangePasswordRequest request, IUserFacade userFacade, HttpContext context) => 
-                userFacade.ChangePasswordAsync(context.GetUserId(), request.OldPassword, request.NewPassword))
+        app.MapPut($"{AuthenticationBasePath}/", async (ChangePasswordRequest request, IUserFacade userFacade, HttpContext context) => 
+                await userFacade.ChangePasswordAsync(context.GetUserId(), request.OldPassword, request.NewPassword)
+                ? Results.Ok() 
+                : Results.BadRequest("Wrong password"))
         .WithTags(AuthenticationTag)
         .WithName($"ChangePassword");
     }

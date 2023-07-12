@@ -1,6 +1,4 @@
-﻿using System.IdentityModel.Tokens.Jwt;
-
-namespace DebtTracker.Api.Messages;
+﻿namespace DebtTracker.Common.ApiMessages;
 
 public record AuthenticateResponse
 {

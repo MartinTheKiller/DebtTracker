@@ -1,4 +1,4 @@
-﻿namespace DebtTracker.Api.Messages;
+﻿namespace DebtTracker.Common.ApiMessages;
 
 public record AuthenticateRequest
 {

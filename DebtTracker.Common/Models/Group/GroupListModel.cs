@@ -1,4 +1,4 @@
-﻿namespace DebtTracker.BL.Models.Group;
+﻿namespace DebtTracker.Common.Models;
 
 public record GroupListModel : ModelBase
 {

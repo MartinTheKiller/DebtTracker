@@ -1,9 +1,5 @@
 ﻿using AutoMapper;
-using DebtTracker.BL.Models;
-using DebtTracker.BL.Models.Debt;
-using DebtTracker.BL.Models.Group;
-using DebtTracker.BL.Models.RegisteredGroup;
-using DebtTracker.BL.Models.User;
+using DebtTracker.Common.Models;
 using DebtTracker.DAL.Entities;
 
 namespace DebtTracker.BL.Mappers;

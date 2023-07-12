@@ -1,4 +1,4 @@
-﻿namespace DebtTracker.BL.Models;
+﻿namespace DebtTracker.Common.Models;
 
 public abstract record ModelBase : IModel
 {

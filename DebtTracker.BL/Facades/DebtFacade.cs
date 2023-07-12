@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
-using DebtTracker.BL.Models;
-using DebtTracker.BL.Models.Debt;
+using DebtTracker.Common.Models;
 using DebtTracker.DAL.Entities;
 using DebtTracker.DAL.Mappers;
 using DebtTracker.DAL.UnitOfWork;

@@ -1,6 +1,5 @@
 ﻿using DebtTracker.BL.Facades;
-using DebtTracker.BL.Models;
-using DebtTracker.BL.Models.Debt;
+using DebtTracker.Common.Models;
 using DebtTracker.Common.Tests;
 using DebtTracker.Common.Tests.Seeds;
 using Microsoft.EntityFrameworkCore;

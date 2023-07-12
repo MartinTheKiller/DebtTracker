@@ -1,12 +1,12 @@
 ﻿using System.Collections;
 using AutoMapper;
-using DebtTracker.BL.Models;
 using DebtTracker.DAL.Entities;
 using DebtTracker.DAL.Mappers;
 using DebtTracker.DAL.UnitOfWork;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 using CubiTracker.DAL.Repositories;
+using DebtTracker.Common.Models;
 
 namespace DebtTracker.BL.Facades;
 

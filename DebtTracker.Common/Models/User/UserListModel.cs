@@ -1,4 +1,4 @@
-﻿namespace DebtTracker.BL.Models.User;
+﻿namespace DebtTracker.Common.Models;
 
 public record UserListModel : ModelBase
 {

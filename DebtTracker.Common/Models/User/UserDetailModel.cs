@@ -1,11 +1,9 @@
-﻿using DebtTracker.BL.Models.Debt;
-using DebtTracker.BL.Models.RegisteredGroup;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 
-namespace DebtTracker.BL.Models.User;
+namespace DebtTracker.Common.Models;
 
-public record UserCreateModel : ModelBase
+public record UserDetailModel : ModelBase
 {
     [MaxLength(50)]
     public required string Name { get; set; }
@@ -17,21 +15,18 @@ public record UserCreateModel : ModelBase
     public required string Email { get; set; }
     [MaxLength(500)]
     public string? PhotoUri { get; set; }
-    [MaxLength(60)]
-    public required string HashedPassword { get; init; } = string.Empty;
 
     public ObservableCollection<DebtListModel> OwesDebts { get; set; } = new();
     public ObservableCollection<DebtListModel> LentDebts { get; set; } = new();
     public ObservableCollection<RegisteredGroupModel> Groups { get; set; } = new();
 
-    public static UserCreateModel Empty => new()
+    public static UserDetailModel Empty => new()
     {
         Id = Guid.Empty,
         Name = string.Empty,
         Surname = string.Empty,
         BankAccount = string.Empty,
         Email = string.Empty,
-        PhotoUri = string.Empty,
-        HashedPassword = string.Empty
+        PhotoUri = string.Empty
     };
 }

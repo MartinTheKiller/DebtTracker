@@ -1,5 +1,4 @@
-﻿using DebtTracker.BL.Models;
-using DebtTracker.BL.Models.Group;
+﻿using DebtTracker.Common.Models;
 using DebtTracker.DAL.Entities;
 
 namespace DebtTracker.BL.Facades;

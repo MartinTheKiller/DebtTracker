@@ -1,4 +1,4 @@
-﻿namespace DebtTracker.BL.Models;
+﻿namespace DebtTracker.Common.Models;
 
 public interface IModel
 {

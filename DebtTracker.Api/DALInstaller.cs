@@ -32,8 +32,6 @@ public static class DALInstaller
         }
 
 
-        IDbContextFactory<DebtTrackerDbContext> dbContextFactory;
-
         if (options.SqLite?.Enabled == true) ConfigureSqLite(options.SqLite, services);
 
         if (options.SqlServer?.Enabled == true) ConfigureSqlServer(options.SqlServer, services);

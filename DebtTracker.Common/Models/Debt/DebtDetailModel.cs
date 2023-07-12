@@ -1,8 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using DebtTracker.BL.Models.Group;
-using DebtTracker.BL.Models.User;
 
-namespace DebtTracker.BL.Models.Debt;
+namespace DebtTracker.Common.Models;
 
 public record DebtDetailModel : ModelBase
 {

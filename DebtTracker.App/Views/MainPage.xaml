@@ -1,0 +1,76 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<views:ContentPageBase xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:DebtTracker.App.ViewModels;assembly=DebtTracker.App"
+             xmlns:views="clr-namespace:DebtTracker.App.Views"
+             x:Class="DebtTracker.App.Views.MainPage"
+             x:DataType="vm:MainPageViewModel">
+
+    <ScrollView>
+        <VerticalStackLayout
+            Spacing="25"
+            Padding="30,0"
+            VerticalOptions="Center">
+
+            <Label
+                Text="Test page"
+                FontSize="Title"
+                HorizontalOptions="Center" />
+
+            <Label
+                Text="Login"
+                FontSize="25"
+                HorizontalOptions="Center" />
+
+            <Entry 
+                Text="{Binding Email}"
+                Placeholder="Email"
+                />
+
+            <Entry
+                Text="{Binding Password}"
+                Placeholder="Password"
+                IsPassword="True" />
+
+            <Button
+                Text="Log in"
+                SemanticProperties.Hint="Sends login request to the server"
+                Command="{Binding LoginCommand}"
+                HorizontalOptions="Center" />
+
+            <Label
+                Text="New debt"
+                FontSize="25"
+                HorizontalOptions="Center" />
+
+            <Entry
+                Text="{Binding NewDebt.Name}"
+                Placeholder="Name" />
+
+            <Entry
+                Text="{Binding NewDebt.Amount}"
+                Placeholder="Amount" />
+
+            <Entry
+                Text="{Binding NewDebt.Description}"
+                Placeholder="Description" />
+
+            <Button
+                Text="Create debt"
+                SemanticProperties.Hint="Creates new debt (must be logged in)"
+                Command="{Binding CreateDebtCommand}"
+                HorizontalOptions="Center" />
+
+            <Button
+                Text="Get all debts"
+                SemanticProperties.Hint="Gets all debts from server (must be logged in)"
+                Command="{Binding GetDebtsCommand}"
+                HorizontalOptions="Center" />
+
+            <Label
+                Text="{Binding Response}" />
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+</views:ContentPageBase>

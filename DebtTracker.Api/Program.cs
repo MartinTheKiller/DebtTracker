@@ -274,6 +274,7 @@ void UseRouting(WebApplication app, IConfiguration configuration)
 
                 return Results.Ok(response);
             })
+            .Produces<AuthenticateResponse>()
             .WithTags(AuthenticationTag)
             .WithName($"Authenticate")
             .AllowAnonymous();
